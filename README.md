@@ -20,4 +20,7 @@ With the bid and ask prices, in the next round of updates, we see if the orderbo
 All of the machine learning exists within `model.py` and `research.ipynb`. Feature engineering and model training is done in `research.ipynb`. Then, the model is imported into `model.py` and the feature engineering code for the inference vector is in `model.py`. Whenever a new model is plugged into `model.py`, we also have to change the code under `BinaryClassifier.create_inference_vector(bids, asks, timestamp_str)`, to reflect the appropriate inference vector for a new binary classifier.
 
 ### Personal Research and Outcomes
-Still in Progress
+The ML model is the same model from Machine Learning Paper Trading Simulator (simple). If the model outputs that the asset will go up in price, we increse the target inventory and decrease the risk aversion (make more aggressive buys). The performance is not good
+
+simulation_1_3_update_lag_xgbclassifier2
+![Simulation 1](simulation_graphs/simulation_1_3_update_lag_xgbclassifier2.pkl.csv.png)
