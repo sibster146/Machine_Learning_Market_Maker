@@ -20,25 +20,28 @@ class AvellanedaStoikovMarketMaker:
         self.websocket = WebSocket(self.updates_queue)
         self.symbol = symbol
 
-        risk_aversion = avellaneda_stoikov_parameters["risk_aversion"]
-        volatility = avellaneda_stoikov_parameters["volatility"]
-        time_horizon = avellaneda_stoikov_parameters["time_horizon"]
-        max_inventory_level = avellaneda_stoikov_parameters["max_inventory_level"]
-        market_depth = avellaneda_stoikov_parameters["market_depth"]
+        # risk_aversion = avellaneda_stoikov_parameters["risk_aversion"]
+        # volatility = avellaneda_stoikov_parameters["volatility"]
+        # time_horizon = avellaneda_stoikov_parameters["time_horizon"]
+        # max_inventory_level = avellaneda_stoikov_parameters["max_inventory_level"]
+        # market_depth = avellaneda_stoikov_parameters["market_depth"]
         order_size = avellaneda_stoikov_parameters["order_size"]
-        product_info = get_product_info(symbol)
-        initial_mid_price = product_info["mid_price"]
-        tick_size = product_info["tick_size"]
+        # product_info = get_product_info(symbol)
+        # initial_mid_price = product_info["mid_price"]
+        # tick_size = product_info["tick_size"]
 
 
         self.as_algo = AvellanedaStoikov(
-            gamma = risk_aversion,
-            kappa = market_depth,
-            sigma = volatility,
-            T = time_horizon,
-            q_max = max_inventory_level,
-            mid_price=initial_mid_price,
-            tick_size=tick_size
+            # gamma = risk_aversion,
+            # kappa = market_depth,
+            # sigma = volatility,
+            # T = time_horizon,
+            # q_max = max_inventory_level,
+            # mid_price=initial_mid_price,
+            # tick_size=tick_size
+            time_horizon=3,
+            volatility_window=25,
+            price_level_num=10
         )
 
         self.completed_trades_queue = Queue()
@@ -176,15 +179,17 @@ class MLMarketMaker:
             bids, asks = self.orderbook.get_n_level_bids_asks(self.binary_classifier.price_level_num)
             timestamp_str = msg_json["timestamp"]
             self.up = self.binary_classifier.create_inference_vector(bids, asks, timestamp_str)
+            bid_ask_prices = self.as_algo.get_bid_ask_prices(mid_price = mid_price, bids=bids, asks=asks, sequence_number=sequence_number%3, ml = 1 if self.up else 1e-9)
+            if not bid_ask_prices:
+                return
+            bid_price, ask_price = bid_ask_prices
 
-            bid_price, ask_price = self.as_algo.optimal_quotes(q = self.portfolio.inventory, t = sequence_number % 3)
-
-            if not self.up:
-                bid_price = -float("inf")
-            if self.positions and self.positions[0][0] == sequence_number + 1:
-                ask_price = max(ask_price,self.positions.popleft()[1] + 0.01)
-                if bid_price > ask_price:
-                    bid_price = ask_price
+            # if not self.up:
+            #     bid_price = -float("inf")
+            # if self.positions and self.positions[0][0] == sequence_number + 1:
+            #     ask_price = max(ask_price,self.positions.popleft()[1] + 0.01)
+            #     if bid_price > ask_price:
+            #         bid_price = ask_price
 
             self.quoted_ask_price = ask_price
             self.quoted_bid_price = bid_price
@@ -259,10 +264,11 @@ class ControlledMarketMaker:
             
             # Update portfolio value
             self.portfolio.update(mid_price)
-
             sequence_number = msg_json["sequence_num"]
-
-            bid_price, ask_price = self.as_algo.optimal_quotes(q = self.portfolio.inventory, t = sequence_number % 3)
-
+            bids, asks = self.orderbook.get_n_level_bids_asks(10)
+            bid_ask_prices = self.as_algo.get_bid_ask_prices(mid_price = mid_price, bids=bids, asks=asks, sequence_number=sequence_number%3)
+            if not bid_ask_prices:
+                return
+            bid_price, ask_price = bid_ask_prices
             self.quoted_ask_price = ask_price
             self.quoted_bid_price = bid_price

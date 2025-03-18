@@ -12,6 +12,34 @@ class OrderBook:
         bids[:,0] = -bids[:,0]
 
         return bids,asks
+    
+    def get_x_percentage_level_bids_asks(self,x):
+        mid_price = self.get_mid_price()
+        top_x_price = mid_price + (mid_price*x)
+        bottom_x_price = mid_price - (mid_price*x)
+
+        asks = []
+        bids = []
+
+        i = 0
+        while i < len(self.asks) and self.asks[i][0] <= top_x_price:
+            asks.append(self.asks[i])
+            i+=1
+        i = 0
+        while i < len(self.bids) and -self.bids[i][0] >= bottom_x_price:
+            bids.append(self.bids[i])
+            i+=1
+
+        asks = np.array(asks)
+        bids = np.array(bids)
+        bids[:,0] = -bids[:,0]
+
+        return bids,asks
+
+        
+
+        
+
 
 
     def get_mid_price(self):
