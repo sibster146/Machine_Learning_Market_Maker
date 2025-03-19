@@ -1,6 +1,5 @@
 # Machine Learning Avelleneda Stoikhov Market Maker
 ## About
-STILL A WORK IN PROGRESS
 This repo is a paper market making simulator to test the live performance of custom market making algorithms against the popular Avelleneda Stoikov algorithm. The custom market making algorithm in this repo is a machine learning algorithm that is built upon the standard Avellenda Stoikov algorithm. The ML algo predicts the price movement of an asset. If the asset is predicted to move up in price, we modify the Avellenda Stoikov model to long the asset (more aggressive buying); if the price is to move down, we short the asset (more aggressive selling) This simulator is connected to the Coinbase exchange, but in theory, can be applied to any exchange and any asset class. You can plug and play any machine learning binary classifier to see its performance. The binary classifier should be trained to predict when the mid price will go up and when it will go down, and the simulator will show how accurately it will be able to do so. NOTE: This simulator should not be used to test PnL performance because this simulator does not account for volume of orders on the orderbook; the Advanced version on my repo page does this; this simulator only shows how accurately the binary classifier can predict price movement.
 
 ## Workflow
@@ -20,7 +19,7 @@ With the bid and ask prices, in the next round of updates, we see if the orderbo
 All of the machine learning exists within `model.py` and `research.ipynb`. Feature engineering and model training is done in `research.ipynb`. Then, the model is imported into `model.py` and the feature engineering code for the inference vector is in `model.py`. Whenever a new model is plugged into `model.py`, we also have to change the code under `BinaryClassifier.create_inference_vector(bids, asks, timestamp_str)`, to reflect the appropriate inference vector for a new binary classifier.
 
 ### Personal Research and Outcomes
-The ML model is the same model from Machine Learning Paper Trading Simulator (simple). If the model outputs that the asset will go up in price, we increse the target inventory and decrease the risk aversion (make more aggressive buys). The performance is not good
+The ML model is the same model from Machine Learning Paper Trading Simulator (simple). If the model outputs that the asset will go up in price, we increse the target inventory and decrease the risk aversion (make more aggressive buys). The performance is not better compared to the traditional stoikhov model with fixed parameters. This is still a work in progress.
 
-simulation_1_3_update_lag_xgbclassifier2
-![Simulation 1](simulation_graphs/simulation_1_3_update_lag_xgbclassifier2.pkl.csv.png)
+simulation_2_3_update_lag_xgbclassifier2
+![Simulation 1](simulation_graphs/simulation_2_3_update_lag_xgbclassifier2.pkl.csv.png)
