@@ -11,7 +11,7 @@ from portfolio import Portfolio
 import os
 import csv
 from collections import deque
-from avelleneda_stoikhov import AvellanedaStoikov
+from avelleneda_stoikov import AvellanedaStoikov
 
 class AvellanedaStoikovMarketMaker:
 
